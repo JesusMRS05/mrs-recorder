@@ -7,8 +7,12 @@ import threading
 import os
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageTk
+import time
 
 # ---------------- CONFIG ----------------
+
+FPS = 60
+FRAME_TIME = 1 / FPS
 
 BG = "#1e1e1e"
 GREEN = "#6bd66b"
@@ -196,11 +200,13 @@ canvas_overlay.bind("<Configure>",lambda e: draw_handles())
 
 def record_screen():
 
-    global recording,frames
+    global recording, frames
 
     with mss.mss() as sct:
 
         while recording:
+
+            start = time.time()
 
             x = overlay.winfo_x()
             y = overlay.winfo_y()
@@ -214,6 +220,12 @@ def record_screen():
             frame = cv2.cvtColor(frame,cv2.COLOR_BGRA2BGR)
 
             frames.append(frame)
+
+            elapsed = time.time() - start
+            sleep_time = FRAME_TIME - elapsed
+
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
 # ---------------- BUTTON ----------------
 
